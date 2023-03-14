@@ -1,6 +1,16 @@
 
 -- standalone
-    return { "lervag/vimtex" }
+    return { "lervag/vimtex",
+
+             config = function()
+      -- vim.g.onedark_config = {
+      --   style = 'darker',
+      -- }
+      -- vim.cmd.colorscheme 'onedark'
+               vim.g.vimtex_view_method = "skim"
+             end,
+
+           }
 
 
 --=========================================================================
