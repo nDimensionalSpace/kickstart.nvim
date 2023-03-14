@@ -1,0 +1,561 @@
+
+--
+-- You can add the following Lua code to your init.lua to bootstrap lazy.nvim
+--
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+
+--
+-- Next step is to add lazy.nvim below the code added in the last step in init.lua
+--
+-- make sure to set "mapleader" before lazy so your mappings are correct
+vim.g.mapleader = " "
+-- proceed
+--require("lazy").setup(plugins, opts)
+require("lazy").setup({
+--    "folke/which-key.nvim",
+--    { "folke/neoconf.nvim", cmd = "Neoconf" },
+--    "folke/neodev.nvim",
+    { 'echasnovski/mini.nvim', version = false },
+-- predicate for "fuzzy"
+    { 'nvim-telescope/telescope.nvim',
+      dependencies = { 'nvim-lua/plenary.nvim' },
+    },
+-- recommended for "statusline"
+    { 'lewis6991/gitsigns.nvim' },
+    { 'nvim-tree/nvim-web-devicons' },
+-- standalone
+    { 'navarasu/onedark.nvim' },
+    { "lervag/vimtex" },
+    -- { "brymer-meneses/grammar-guard.nvim",
+      -- dependencies = { "neovim/nvim-lspconfig", "williamboman/mason.nvim" }
+    -- },
+    { "vigoux/ltex-ls.nvim",
+      dependencies = { "neovim/nvim-lspconfig" }
+    },
+    -- if shade doesnt work out, try "tint"
+    -- { "sunjon/shade.nvim" },
+    -- "tint" throws errors when opening a session . . .
+    -- { "levouh/tint.nvim" },
+    -- tint has a strange appearance
+})
+
+
+--=========================================================================
+require('mini.basics').setup(
+-- No need to copy this inside `setup()`. Will be used automatically.
+{
+  -- Options. Set to `false` to disable.
+  options = {
+    -- Basic options ('termguicolors', 'number', 'ignorecase', and many more)
+    basic = true,
+
+    -- Extra UI features ('winblend', 'cmdheight=0', ...)
+    extra_ui = false,
+
+    -- Presets for window borders ('single', 'double', ...)
+    win_borders = 'default',
+  },
+
+  -- Mappings. Set to `false` to disable.
+  mappings = {
+    -- Basic mappings (better 'jk', save with Ctrl+S, ...)
+    basic = true,
+
+    -- Prefix for mappings that toggle common options ('wrap', 'spell', ...).
+    -- Supply empty string to not create these mappings.
+    option_toggle_prefix = [[\]],
+
+    -- Window navigation with <C-hjkl>, resize with <C-arrow>
+    windows = false,
+
+    -- Move cursor in Insert, Command, and Terminal mode with <M-hjkl>
+    move_with_alt = false,
+  },
+
+  -- Autocommands. Set to `false` to disable
+  autocommands = {
+    -- Basic autocommands (highlight on yank, start Insert in terminal, ...)
+    basic = true,
+
+    -- Set 'relativenumber' only in linewise and blockwise Visual mode
+    relnum_in_visual_mode = false,
+  },
+}
+)
+
+
+--=========================================================================
+require('mini.comment').setup(
+-- No need to copy this inside `setup()`. Will be used automatically.
+{
+  -- Options which control module behavior
+  options = {
+    -- Whether to ignore blank lines when adding comment
+    ignore_blank_line = false,
+
+    -- Whether to recognize as comment only lines without indent
+    start_of_line = false,
+  },
+
+  -- Module mappings. Use `''` (empty string) to disable one.
+  mappings = {
+    -- Toggle comment (like `gcip` - comment inner paragraph) for both
+    -- Normal and Visual modes
+    comment = 'gc',
+
+    -- Toggle comment on current line
+    comment_line = 'gcc',
+
+    -- Define 'comment' textobject (like `dgc` - delete whole comment block)
+    textobject = 'gc',
+  },
+
+  -- Hook functions to be executed at certain stage of commenting
+  hooks = {
+    -- Before successful commenting. Does nothing by default.
+    pre = function() end,
+    -- After successful commenting. Does nothing by default.
+    post = function() end,
+  },
+}
+)
+
+
+--=========================================================================
+require('mini.completion').setup(
+-- No need to copy this inside `setup()`. Will be used automatically.
+{
+  -- Delay (debounce type, in ms) between certain Neovim event and action.
+  -- This can be used to (virtually) disable certain automatic actions by
+  -- setting very high delay time (like 10^7).
+  delay = { completion = 100, info = 100, signature = 50 },
+
+  -- Configuration for action windows:
+  -- - `height` and `width` are maximum dimensions.
+  -- - `border` defines border (as in `nvim_open_win()`).
+  window = {
+    info = { height = 25, width = 80, border = 'none' },
+    signature = { height = 25, width = 80, border = 'none' },
+  },
+
+  -- Way of how module does LSP completion
+  lsp_completion = {
+    -- `source_func` should be one of 'completefunc' or 'omnifunc'.
+    source_func = 'completefunc',
+
+    -- `auto_setup` should be boolean indicating if LSP completion is set up
+    -- on every `BufEnter` event.
+    auto_setup = true,
+
+    -- `process_items` should be a function which takes LSP
+    -- 'textDocument/completion' response items and word to complete. Its
+    -- output should be a table of the same nature as input items. The most
+    -- common use-cases are custom filtering and sorting. You can use
+    -- default `process_items` as `MiniCompletion.default_process_items()`.
+    --process_items = --<function: filters out snippets; sorts by LSP specs>,
+  },
+
+  -- Fallback action. It will always be run in Insert mode. To use Neovim's
+  -- built-in completion (see `:h ins-completion`), supply its mapping as
+  -- string. Example: to use 'whole lines' completion, supply '<C-x><C-l>'.
+  --fallback_action = --<function: like `<C-n>` completion>,
+
+  -- Module mappings. Use `''` (empty string) to disable one. Some of them
+  -- might conflict with system mappings.
+  mappings = {
+    force_twostep = '<C-Space>', -- Force two-step completion
+    force_fallback = '<A-Space>', -- Force fallback completion
+  },
+
+  -- Whether to set Vim's settings for better experience (modifies
+  -- `shortmess` and `completeopt`)
+  set_vim_settings = true,
+}
+)
+
+
+--=========================================================================
+-- it is not clear that fuzzy does anything . . .  delete, for now
+--=========================================================================
+-- require('mini.fuzzy').setup(
+-- -- No need to copy this inside `setup()`. Will be used automatically.
+-- {
+--   -- Maximum allowed value of match features (width and first match). All
+--   -- feature values greater than cutoff can be considered "equally bad".
+--   cutoff = 100,
+-- }
+-- )
+
+
+--=========================================================================
+require('mini.indentscope').setup(
+-- No need to copy this inside `setup()`. Will be used automatically.
+{
+  -- Draw options
+  draw = {
+    -- Delay (in ms) between event and start of drawing scope indicator
+    delay = 100,
+
+    -- Animation rule for scope's first drawing. A function which, given
+    -- next and total step numbers, returns wait time (in ms). See
+    -- |MiniIndentscope.gen_animation| for builtin options. To disable
+    -- animation, use `require('mini.indentscope').gen_animation.none()`.
+    --animation = --<function: implements constant 20ms between steps>,
+    animation = function(s, n)
+	return 20
+    end,
+
+    -- Symbol priority. Increase to display on top of more symbols.
+    priority = 2,
+  },
+
+  -- Module mappings. Use `''` (empty string) to disable one.
+  mappings = {
+    -- Textobjects
+    object_scope = 'ii',
+    object_scope_with_border = 'ai',
+
+    -- Motions (jump to respective border line; if not present - body line)
+    goto_top = '[i',
+    goto_bottom = ']i',
+  },
+
+  -- Options which control scope computation
+  options = {
+    -- Type of scope's border: which line(s) with smaller indent to
+    -- categorize as border. Can be one of: 'both', 'top', 'bottom', 'none'.
+    border = 'both',
+
+    -- Whether to use cursor column when computing reference indent.
+    -- Useful to see incremental scopes with horizontal cursor movements.
+    indent_at_cursor = true,
+
+    -- Whether to first check input line to be a border of adjacent scope.
+    -- Use it if you want to place cursor on function header to get scope of
+    -- its body.
+    try_as_border = false,
+  },
+
+  -- Which character to use for drawing scope indicator
+  symbol = '╎',
+}
+)
+
+
+--=========================================================================
+require('mini.sessions').setup(
+-- No need to copy this inside `setup()`. Will be used automatically.
+{
+  -- Whether to read latest session if Neovim opened without file arguments
+  autoread = false,
+
+  -- Whether to write current session before quitting Neovim
+  autowrite = true,
+
+  -- Directory where global sessions are stored (use `''` to disable)
+  --directory = --<"session" subdir of user data directory from |stdpath()|>,
+  directory = '',
+
+  -- File for local session (use `''` to disable)
+  file = 'Session.vim',
+
+  -- Whether to force possibly harmful actions (meaning depends on function)
+  force = { read = false, write = true, delete = false },
+
+  -- Hook functions for actions. Default `nil` means 'do nothing'.
+  hooks = {
+    -- Before successful action
+    pre = { read = nil, write = nil, delete = nil },
+    -- After successful action
+    post = { read = nil, write = nil, delete = nil },
+  },
+
+  -- Whether to print session path after action
+  verbose = { read = false, write = true, delete = true },
+}
+)
+
+
+--=========================================================================
+require('mini.starter').setup(
+-- No need to copy this inside `setup()`. Will be used automatically.
+{
+  -- Whether to open starter buffer on VimEnter. Not opened if Neovim was
+  -- started with intent to show something else.
+  autoopen = true,
+
+  -- Whether to evaluate action of single active item
+  evaluate_single = false,
+
+  -- Items to be displayed. Should be an array with the following elements:
+  -- - Item: table with <action>, <name>, and <section> keys.
+  -- - Function: should return one of these three categories.
+  -- - Array: elements of these three types (i.e. item, array, function).
+  -- If `nil` (default), default items will be used (see |mini.starter|).
+  items = nil,
+
+  -- Header to be displayed before items. Converted to single string via
+  -- `tostring` (use `\n` to display several lines). If function, it is
+  -- evaluated first. If `nil` (default), polite greeting will be used.
+  header = nil,
+
+  -- Footer to be displayed after items. Converted to single string via
+  -- `tostring` (use `\n` to display several lines). If function, it is
+  -- evaluated first. If `nil` (default), default usage help will be shown.
+  footer = nil,
+
+  -- Array  of functions to be applied consecutively to initial content.
+  -- Each function should take and return content for 'Starter' buffer (see
+  -- |mini.starter| and |MiniStarter.content| for more details).
+  content_hooks = nil,
+
+  -- Characters to update query. Each character will have special buffer
+  -- mapping overriding your global ones. Be careful to not add `:` as it
+  -- allows you to go into command mode.
+  query_updaters = 'abcdefghijklmnopqrstuvwxyz0123456789_-.',
+}
+)
+
+
+--=========================================================================
+require('mini.statusline').setup(
+-- No need to copy this inside `setup()`. Will be used automatically.
+{
+  -- Content of statusline as functions which return statusline string. See
+  -- `:h statusline` and code of default contents (used instead of `nil`).
+  content = {
+    -- Content for active window
+    active = nil,
+    -- Content for inactive window(s)
+    inactive = nil,
+  },
+
+  -- Whether to use icons by default
+  use_icons = true,
+
+  -- Whether to set Vim's settings for statusline (make it always shown with
+  -- 'laststatus' set to 2). To use global statusline in Neovim>=0.7.0, set
+  -- this to `false` and 'laststatus' to 3.
+  set_vim_settings = true,
+}
+)
+
+
+--=========================================================================
+require('mini.surround').setup(
+-- No need to copy this inside `setup()`. Will be used automatically.
+{
+  -- Add custom surroundings to be used on top of builtin ones. For more
+  -- information with examples, see `:h MiniSurround.config`.
+  custom_surroundings = nil,
+
+  -- Duration (in ms) of highlight when calling `MiniSurround.highlight()`
+  highlight_duration = 500,
+
+  -- Module mappings. Use `''` (empty string) to disable one.
+  mappings = {
+    add = 'sa', -- Add surrounding in Normal and Visual modes
+    delete = 'sd', -- Delete surrounding
+    find = 'sf', -- Find surrounding (to the right)
+    find_left = 'sF', -- Find surrounding (to the left)
+    highlight = 'sh', -- Highlight surrounding
+    replace = 'sr', -- Replace surrounding
+    update_n_lines = 'sn', -- Update `n_lines`
+
+    suffix_last = 'l', -- Suffix to search with "prev" method
+    suffix_next = 'n', -- Suffix to search with "next" method
+  },
+
+  -- Number of lines within which surrounding is searched
+  n_lines = 20,
+
+  -- Whether to respect selection type:
+  -- - Place surroundings on separate lines in linewise mode.
+  -- - Place surroundings on each line in blockwise mode.
+  respect_selection_type = false,
+
+  -- How to search for surrounding (first inside current line, then inside
+  -- neighborhood). One of 'cover', 'cover_or_next', 'cover_or_prev',
+  -- 'cover_or_nearest', 'next', 'prev', 'nearest'. For more details,
+  -- see `:h MiniSurround.config`.
+  search_method = 'cover',
+}
+)
+
+
+--=========================================================================
+require('mini.trailspace').setup(
+-- No need to copy this inside `setup()`. Will be used automatically.
+{
+  -- Highlight only in normal buffers (ones with empty 'buftype'). This is
+  -- useful to not show trailing whitespace where it usually doesn't matter.
+  only_in_normal_buffers = true,
+}
+)
+
+
+--=========================================================================
+require('onedark').setup(
+{
+   -- options: dark, darker, cool, deep, warm, warmer, light
+   -- best choices: dark, darker, warmer
+   style = 'darker'
+}
+)
+require('onedark').load()
+
+
+--=========================================================================
+-- vimtex settings
+--=========================================================================
+-- Viewer options: One may configure the viewer either by specifying a built-in
+-- viewer method:
+vim.g.vimtex_view_method = "skim"
+-- not all machines will have skim . . .
+-- MachineName = vim.fn.system("hostname")
+MachineName = vim.fn.hostname()
+print(MachineName)
+if string.find(MachineName,"stanaley") then
+    print("hi stanley!")
+elseif string.find(MachineName,"chuchis") then
+    print("hi chuchis!")
+else
+    print("ERROR: machine name unknown, quitting . . .")
+    -- how to exit from nvim altogether here???
+    -- vim.fn.quit()
+    -- vim.fn.exit()
+    -- vim.sys.quit()
+    -- vim.system.quit()
+    -- print(nvim_get_namespaces())
+end
+
+-- Or with a generic interface:
+-- let g:vimtex_view_general_viewer = 'okular'
+-- let g:vimtex_view_general_options = '--unique file:@pdf\#src:@line@tex'
+
+
+-- require("grammar-guard").init()
+-- require("lspconfig").grammar_guard.setup({
+--   -- on_attach = handlers.on_attach,
+--   capabilities = capabilities,
+--   cmd = { "/usr/local/bin/ltex-ls" },
+--   settings = {
+--     ltex = {
+--       enabled = { "latex", "tex", "bib", "markdown" },
+--       language = "en-US",
+--       diagnosticSeverity = "info",
+--       checkFrequency = "save",
+--       setenceCacheSize = 2000,
+--       additionalRules = {
+--         enablePickyRules = false,
+--       },
+--       trace = { server = "verbose" },
+--       disabledRules = {
+--         ["en-GB"] = { "MORFOLOGIK_RULE_EN_GB" },
+--       },
+--     },
+--   },
+-- })
+require("ltex-ls").setup({
+  on_attach = on_attach,
+  capabilities = capabilities,
+  use_spellfile = false,
+  filetypes = { "latex", "tex", "bib", "markdown", "gitcommit", "text" },
+  settings = {
+    ltex = {
+      enabled = { "latex", "tex", "bib", "markdown" },
+      -- language = "en-US",
+      language = "auto",
+      -- diagnosticSeverity = "information",
+      diagnosticSeverity = "warning",
+      checkFrequency = "save",
+      setenceCacheSize = 2000,
+      additionalRules = {
+        enablePickyRules = true,
+	motherTongue = "en-US",
+      },
+      -- trace = { server = "verbose" },
+      disabledRules = {
+        -- ["en-US"] = { "PASSIVE_VOICE" },
+        ["en"] = { "PASSIVE_VOICE", "WANT" },
+      },
+      -- dictionary = (function()
+      --   -- For dictionary, search for files in the runtime to have
+      --   -- and include them as externals the format for them is
+      --   -- dict/{LANG}.txt
+      --   --
+      --   -- Also add dict/default.txt to all of them
+      --   local files = {}
+      --   for _, file in ipairs(vim.api.nvim_get_runtime_file("dict/*", true)) do
+      --     local lang = vim.fn.fnamemodify(file, ":t:r")
+      --     local fullpath = vim.fs.normalize(file, ":p")
+      --     files[lang] = { ":" .. fullpath }
+      --   end
+      --
+      --   if files.default then
+      --     for lang, _ in pairs(files) do
+      --       if lang ~= "default" then
+      --         vim.list_extend(files[lang], files.default)
+      --       end
+      --     end
+      --     files.default = nil
+      --   end
+      --   return files
+      -- end)(),
+    },
+  },
+})
+
+vim.diagnostic.config({
+    virtual_text = false
+})
+-- Show line diagnostics automatically in hover window
+vim.o.updatetime = 250
+vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
+vim.keymap.set('n', '[g', '<cmd>lua vim.diagnostic.goto_prev({ float =  { border = "single" }})<CR>', opts)
+vim.keymap.set('n', ']g', '<cmd>lua vim.diagnostic.goto_next({ float =  { border = "single" }})<CR>', opts)
+
+--=========================================================================
+-- require('shade').setup(
+-- {
+--     overlay_opacity = 50,
+--     opacity_step = 1,
+--     keys = {
+--         brightness_up    = '<C-Up>',
+--         brightness_down  = '<C-Down>',
+--         toggle           = '<Leader>s',
+--     }
+-- }
+-- )
+-- require("tint").setup(
+-- {
+--   tint = -75,  -- Darken colors, use a positive value to brighten
+--   saturation = 0.1,  -- Saturation to preserve
+--   -- transforms = require("tint").transforms.SATURATE_TINT,  -- Showing default behavior, but value here can be predefined set of transforms
+--   tint_background_colors = true,  -- Tint background portions of highlight groups
+--   -- highlight_ignore_patterns = { "WinSeparator", "Status.*" },  -- Highlight group patterns to ignore, see `string.find`
+--   window_ignore_function = function(winid)
+--     local bufid = vim.api.nvim_win_get_buf(winid)
+--     local buftype = vim.api.nvim_buf_get_option(bufid, "buftype")
+--     local floating = vim.api.nvim_win_get_config(winid).relative ~= ""
+--
+--     -- Do not tint `terminal` or floating windows, tint everything else
+--     return buftype == "terminal" or floating
+--   end
+-- }
+-- )
+
+
+
+
